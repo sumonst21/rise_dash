@@ -24,7 +24,7 @@ def fetch_forms():
     try:
         response.raise_for_status()
     except requests.HTTPError:
-        raise AppMachineError(f'request failed: {response.content}')
+        raise AppMachineError(f'request failed: {response.content} using {HEADERS}')
 
     forms = [item for item in response.json()['result'] if item.get('type') == 'Form']
 
