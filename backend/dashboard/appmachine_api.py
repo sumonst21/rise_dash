@@ -1,6 +1,7 @@
 import numbers
 from collections import defaultdict
 
+import os
 import requests
 
 from django.conf import settings
@@ -28,7 +29,7 @@ def fetch_forms():
     try:
         response.raise_for_status()
     except requests.HTTPError:
-        raise AppMachineError(f'request failed: {response.content} using {HEADERS}')
+        raise AppMachineError(f'request failed: {response.content} using {os.environ}')
 
     forms = [item for item in response.json()['result'] if item.get('type') == 'Form']
 
@@ -40,7 +41,7 @@ def fetch_form_responses(form_id):
         'AM-AppKey': settings.APP_MACHINE_API_KEY,
         'AM-ClientKey': settings.APP_MACHINE_CLIENT_KEY
     }
-    
+
     response = requests.get(
         url=f'{settings.APP_MACHINE_URL}/data/{form_id}',
         headers=HEADERS
