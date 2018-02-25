@@ -1,0 +1,16 @@
+.idea
+frontend/node_modules/*
+**/staticfiles/*
+
+npm-debug\.log
+
+\.vscode/
+*.pyc
+
+frontend/dist/*
+
+frontend/dist/
+
+backend/db\.sqlite3
+
+backend/rise_dash/local_settings\.py
