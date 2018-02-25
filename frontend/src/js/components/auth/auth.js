@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 
-const API_URL = 'http://localhost:8081/obtain_auth_token/';
+const API_URL = 'http://localhost:8081/api/obtain_auth_token/';
 
 
 function loggedIn () {

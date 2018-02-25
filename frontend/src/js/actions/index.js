@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // const API_URL = process.env.BASE_API_URL;
 // const API_URL = 'https://api.appmachine.com/v1/data/';
-const API_URL = 'http://localhost:8081/form_data/';
+const API_URL = 'http://localhost:8081/api/form_data/';
 
 export const FETCH_FILTERS = 'FETCH_FILTERS';
 export const SELECT_FORM = 'SELECT_FORM';
