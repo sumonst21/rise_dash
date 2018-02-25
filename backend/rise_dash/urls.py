@@ -22,7 +22,7 @@ from dashboard.views import FormData
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('form_data/', ListForms.as_view()),
-    path('form_data/<form_id>/', FormData.as_view()),
-    path('obtain_auth_token/', obtain_auth_token)
+    path('api/form_data/', ListForms.as_view()),
+    path('api/form_data/<form_id>/', FormData.as_view()),
+    path('api/obtain_auth_token/', obtain_auth_token)
 ]
