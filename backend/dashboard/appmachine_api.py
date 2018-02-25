@@ -5,10 +5,10 @@ import requests
 
 from django.conf import settings
 
-HEADERS = {
-    'AM-AppKey': settings.APP_MACHINE_API_KEY,
-    'AM-ClientKey': settings.APP_MACHINE_CLIENT_KEY
-}
+# HEADERS = {
+#     'AM-AppKey': settings.APP_MACHINE_API_KEY,
+#     'AM-ClientKey': settings.APP_MACHINE_CLIENT_KEY
+# }
 
 
 class AppMachineError(Exception):
@@ -16,6 +16,10 @@ class AppMachineError(Exception):
 
 
 def fetch_forms():
+    HEADERS = {
+        'AM-AppKey': settings.APP_MACHINE_API_KEY,
+        'AM-ClientKey': settings.APP_MACHINE_CLIENT_KEY
+    }
 
     response = requests.get(
         url=f'{settings.APP_MACHINE_URL}/data',
@@ -32,6 +36,11 @@ def fetch_forms():
 
 
 def fetch_form_responses(form_id):
+    HEADERS = {
+        'AM-AppKey': settings.APP_MACHINE_API_KEY,
+        'AM-ClientKey': settings.APP_MACHINE_CLIENT_KEY
+    }
+    
     response = requests.get(
         url=f'{settings.APP_MACHINE_URL}/data/{form_id}',
         headers=HEADERS
