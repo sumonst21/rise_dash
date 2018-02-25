@@ -142,6 +142,8 @@ APP_MACHINE_URL = 'https://api.appmachine.com/v1'
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 try:
     from .local_settings import *  # noqa Overwrite default settings with local ones # pylint: disable=W0401,W0614
 except ImportError:
