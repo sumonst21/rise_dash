@@ -11,12 +11,20 @@ HEADERS = {
 }
 
 
+class AppMachineError(Exception):
+    pass
+
+
 def fetch_forms():
 
     response = requests.get(
         url=f'{settings.APP_MACHINE_URL}/data',
         headers=HEADERS
     )
+    try:
+        response.raise_for_status()
+    except requests.HTTPError:
+        raise AppMachineError(f'request failed: {response.content}')
 
     forms = [item for item in response.json()['result'] if item.get('type') == 'Form']
 
@@ -28,6 +36,11 @@ def fetch_form_responses(form_id):
         url=f'{settings.APP_MACHINE_URL}/data/{form_id}',
         headers=HEADERS
     )
+    try:
+        response.raise_for_status()
+    except requests.HTTPError:
+        raise AppMachineError(f'request failed: {response.content}')
+
     data = response.json()
     return format_data(data)
 
