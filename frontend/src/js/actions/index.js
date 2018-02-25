@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = `${process.env.BASE_API_URL}/form_data`;
+const API_URL = `${process.env.BASE_API_URL}/form_data/`;
 // const API_URL = 'https://api.appmachine.com/v1/data/';
 // const API_URL = 'http://localhost:8081/api/form_data/';
 

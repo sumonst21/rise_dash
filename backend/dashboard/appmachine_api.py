@@ -11,17 +11,17 @@ from django.conf import settings
 #     'AM-ClientKey': settings.APP_MACHINE_CLIENT_KEY
 # }
 
+HEADERS = {
+        'AM-AppKey': settings.APP_MACHINE_API_KEY,
+        'AM-ClientKey': settings.APP_MACHINE_CLIENT_KEY
+    }
+
 
 class AppMachineError(Exception):
     pass
 
 
 def fetch_forms():
-    HEADERS = {
-        'AM-AppKey': settings.APP_MACHINE_API_KEY,
-        'AM-ClientKey': settings.APP_MACHINE_CLIENT_KEY
-    }
-
     response = requests.get(
         url=f'{settings.APP_MACHINE_URL}/data',
         headers=HEADERS
@@ -29,7 +29,7 @@ def fetch_forms():
     try:
         response.raise_for_status()
     except requests.HTTPError:
-        raise AppMachineError(f'request failed: {response.content} using {os.environ}')
+        raise AppMachineError(f'request failed: {response.content}')
 
     forms = [item for item in response.json()['result'] if item.get('type') == 'Form']
 
@@ -37,11 +37,6 @@ def fetch_forms():
 
 
 def fetch_form_responses(form_id):
-    HEADERS = {
-        'AM-AppKey': settings.APP_MACHINE_API_KEY,
-        'AM-ClientKey': settings.APP_MACHINE_CLIENT_KEY
-    }
-
     response = requests.get(
         url=f'{settings.APP_MACHINE_URL}/data/{form_id}',
         headers=HEADERS
