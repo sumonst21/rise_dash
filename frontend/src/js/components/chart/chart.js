@@ -1,5 +1,8 @@
 import React, {Component} from 'react';
+import { connect } from 'react-redux';
 import { Bar } from 'react-chartjs-2';
+
+import {selectFilteredData} from "../../selectors/selectors";
 
 const allowedCategories = {
     'participation': {
@@ -50,13 +53,6 @@ class Chart extends Component{
                     if (!(Object.keys(allowedCategories).includes(category))) {
                         category = 'no_category'
                     }
-                    // else {
-                    //     console.log(property)
-                    //     let word_list = property.split('_');
-                    //     word_list.shift();
-                    //     property = word_list.join('_');
-                    //     console.log(property)
-                    // }
 
                     if (values[category] === undefined ) {
                         values[category] = {}
@@ -64,12 +60,34 @@ class Chart extends Component{
 
                     if (Number.isInteger(rawData[i][property])) {
                         if (values[category][property] !== undefined) {
-                            values[category][property] = {
-                                count: values[category][property]['count'] + 1,
-                                score: values[category][property]['score'] + rawData[i][property]
+
+                            values[category][property]['count'] += 1;
+                            values[category][property]['score'] += rawData[i][property];
+
+                            if (rawData[i][property] <= 6) {
+                                values[category][property]['detractors'] += 1
+                            } else if (rawData[i][property] <= 8) {
+                                values[category][property]['neutral'] += 1
+                            } else {
+                                values[category][property]['promoters'] += 1
                             }
+
                         } else {
-                            values[category][property] = {count: 1, score: rawData[i][property]}
+                            values[category][property] = {
+                                count: 1,
+                                score: rawData[i][property],
+                                detractors: 0,
+                                neutral: 0,
+                                promoters: 0
+                            };
+
+                            if (rawData[i][property] <= 6) {
+                                values[category][property]['detractors'] += 1
+                            } else if (rawData[i][property] <= 8) {
+                                values[category][property]['neutral'] += 1
+                            } else {
+                                values[category][property]['promoters'] += 1
+                            }
                         }
                     }
                 }
@@ -111,17 +129,27 @@ class Chart extends Component{
     }
 
     componentWillReceiveProps (nextProps) {
+        const calculationMethod = nextProps.calculation;
         const values = this.extractData(nextProps.formId);
         const groupedData = this.group_data(values);
 
         let chartData = Object.assign({}, this.state.chartData);
 
         chartData.labels = groupedData.labels;
-        chartData.datasets[0].data = Object.values(groupedData.data).map(
+
+        if (calculationMethod === 'mean') {
+            chartData.datasets[0].data = Object.values(groupedData.data).map(
                 item => {
                     return item.score / item.count
                 }
             );
+        } else if (calculationMethod === 'nps') {
+            chartData.datasets[0].data = Object.values(groupedData.data).map(
+                item => {
+                    return ((item.promoters - item.detractors) / item.count) * 100
+                }
+            );
+        }
         chartData.datasets[0].backgroundColor = groupedData.backgroundColors;
         chartData.datasets[0].borderColor = groupedData.borderColors;
 
@@ -130,7 +158,7 @@ class Chart extends Component{
     }
 
     render () {
-        const options = {
+        let options = {
             legend: {
                 display: false
             },
@@ -153,6 +181,11 @@ class Chart extends Component{
             }
         };
 
+        if (this.props.calculation === 'nps') {
+            options['scales']['yAxes'][0]['ticks']['min'] = -100;
+            options['scales']['yAxes'][0]['ticks']['max'] = 100;
+        }
+
         return (
             <div className="chart">
                 {Boolean(this.props.formId.length) && <Bar data={this.state.chartData}
@@ -161,5 +194,10 @@ class Chart extends Component{
         )
     }
 }
+function mapStateToProps(state) {
+    return {
+        calculation: state.filters.calculationMethod
+    };
+}
 
-export default Chart;
+export default connect(mapStateToProps, {})(Chart);

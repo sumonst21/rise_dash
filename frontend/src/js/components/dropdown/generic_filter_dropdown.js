@@ -14,13 +14,6 @@ class GenericDropdown extends Component {
         this._onSelect = this._onSelect.bind(this)
     }
 
-    // componentWillReceiveProps(nextProps) {
-    //     console.log('recieving props');
-    //     if (nextProps.data && ! _.isEqual(nextProps.data, this.props.data)) {
-    //         this.setState({...this.state, selected: null});
-    //     }
-    // }
-
     _onSelect (option) {
         this.props.onChange(option.value);
         this.setState({

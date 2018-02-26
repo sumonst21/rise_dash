@@ -5,7 +5,7 @@ import { selectFilteredData } from "../../selectors/selectors";
 import FormNameFilterDropdown from '../dropdown/dropdown';
 import GenericDropdown from '../dropdown/generic_filter_dropdown';
 import Chart from '../chart/chart';
-import { selectDate, selectConsultant } from '../../actions/index';
+import { selectDate, selectConsultant, selectCalculation } from '../../actions/index';
 
 
 class Main extends Component {
@@ -27,7 +27,7 @@ class Main extends Component {
     };
 
     render () {
-        const { hasDate, filtered, hasConsultant } = this.props;
+        const { hasDate, form, filtered, hasConsultant } = this.props;
 
         return (
             <div>
@@ -41,7 +41,11 @@ class Main extends Component {
                                                        onChange={this.props.selectConsultant}
                                                        placeholder="select a name"
                                                        title="Consultant" />}
-                    <Chart formId={filtered}/>
+                    {form && <GenericDropdown data={['mean', 'nps']}
+                                              onChange={this.props.selectCalculation}
+                                              placeholder="mean"
+                                              title="Calculation"/>}
+                    <Chart formId={filtered} />
 
                     {Boolean(this.props.filtered.length) && <h4>Number of forms: {this.props.filtered.length}</h4>}
                 </div>
@@ -59,4 +63,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, { selectDate, selectConsultant })(Main);
+export default connect(mapStateToProps, { selectDate, selectConsultant, selectCalculation })(Main);

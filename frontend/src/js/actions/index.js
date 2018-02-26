@@ -8,6 +8,7 @@ export const FETCH_FILTERS = 'FETCH_FILTERS';
 export const SELECT_FORM = 'SELECT_FORM';
 export const SET_DATE_FILTER = 'SET_DATE_FILTER';
 export const SET_CONSULTANT_FILTER = 'SET_CONSULTANT_FILTER';
+export const SET_CALCULATION = 'SET_CALCULATION';
 
 
 function getHeaders () {
@@ -19,7 +20,6 @@ function getHeaders () {
 export function fetchFilters() {
     const url = `${API_URL}`;
     const request = axios.get(url, {headers: getHeaders()});
-    console.log(request);
     return {
         type: FETCH_FILTERS,
         payload: request
@@ -47,5 +47,12 @@ export function selectConsultant(name) {
     return {
         type: SET_CONSULTANT_FILTER,
         payload: name
+    }
+}
+
+export function selectCalculation(calculation) {
+    return {
+        type: SET_CALCULATION,
+        payload: calculation
     }
 }
