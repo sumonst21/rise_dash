@@ -6,10 +6,6 @@ import requests
 
 from django.conf import settings
 
-# HEADERS = {
-#     'AM-AppKey': settings.APP_MACHINE_API_KEY,
-#     'AM-ClientKey': settings.APP_MACHINE_CLIENT_KEY
-# }
 
 HEADERS = {
         'AM-AppKey': settings.APP_MACHINE_API_KEY,
@@ -47,7 +43,7 @@ def fetch_form_responses(form_id):
         raise AppMachineError(f'request failed: {response.content}')
 
     data = response.json()
-    return format_data(data)
+    return data
 
 
 def format_data(data):

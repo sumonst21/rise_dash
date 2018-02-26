@@ -31,7 +31,7 @@ class Chart extends Component{
             chartData: {
                 labels: ['a', 'b'],
                 datasets: [{
-                    label: "d1",
+                    label: "data",
                     data:[2, 5],
                     backgroundColor: "rgba(213, 50, 99, 0.3)",
                     borderColor: "rgba(213, 50, 99, 0.8)",
@@ -184,6 +184,9 @@ class Chart extends Component{
         if (this.props.calculation === 'nps') {
             options['scales']['yAxes'][0]['ticks']['min'] = -100;
             options['scales']['yAxes'][0]['ticks']['max'] = 100;
+        } else {
+            options['scales']['yAxes'][0]['ticks']['min'] = 0;
+            options['scales']['yAxes'][0]['ticks']['max'] = 10;
         }
 
         return (
