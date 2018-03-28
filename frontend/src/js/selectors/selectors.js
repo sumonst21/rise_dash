@@ -1,22 +1,22 @@
 import { createSelector } from 'reselect'
 
 const selectData = (state) => {
-    return state.filters.form
+    return state.unfilteredData
 };
 
 const selectDateFilter = (state) => {
-    if (state.filters.dateFilter === 'no_filter') {
+    if (state.dateFilter === 'no_filter') {
         return ''
     } else {
-        return state.filters.dateFilter
+        return state.dateFilter
     }
 };
 
 const selectConsultantFilter = (state) => {
-    if (state.filters.consultantFilter === 'no_filter') {
+    if (state.consultantFilter === 'no_filter') {
         return ''
     } else {
-        return state.filters.consultantFilter
+        return state.consultantFilter
     }
 };
 
