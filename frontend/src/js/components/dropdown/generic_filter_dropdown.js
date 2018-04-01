@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
-import { connect } from 'react-redux';
 import Dropdown from 'react-dropdown';
-import _ from 'lodash';
 
 
 class GenericDropdown extends Component {
@@ -17,7 +15,7 @@ class GenericDropdown extends Component {
     _onSelect (option) {
         this.props.onChange(option.value);
         this.setState({
-            selected: option.value
+            selected: option.label
         })
     }
 

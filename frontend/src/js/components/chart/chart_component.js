@@ -49,7 +49,6 @@ class ChartComponent extends Component {
         if (this.state['form'] !== nextState['form']) {
             this.fetchFormData(nextState['form'])
         }
-        console.log(nextState);
         nextState['filteredData'] = Boolean(nextState['filteredData']) ? selectFilteredData(nextState) : []
     }
 
@@ -81,30 +80,28 @@ class ChartComponent extends Component {
 
         return (
             <div>
-                <div className="generic-card">
-                    <GenericDropdown data={ChartComponent.mapForms(formsList)}
-                                     onChange={(v) => {this.setState({ form: v })}}
-                                     placeholder="select a form"
-                                     title="Form" />
+                <GenericDropdown data={ChartComponent.mapForms(formsList)}
+                                 onChange={(v) => {this.setState({ form: v })}}
+                                 placeholder="select a form"
+                                 title="Form" />
 
-                    {Boolean(this.state.form) && <GenericDropdown data={['mean', 'nps']}
-                                              onChange={(v) => {this.setState({ calculationMethod: v})}}
-                                              placeholder="mean"
-                                              title="Calculation"/>}
+                {Boolean(this.state.form) && <GenericDropdown data={['mean', 'nps']}
+                                          onChange={(v) => {this.setState({ calculationMethod: v})}}
+                                          placeholder="mean"
+                                          title="Calculation"/>}
 
-                    {this.state.hasDate && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'date_of_session')}
-                                                            onChange={(v) => {this.setState({ dateFilter: v })}}
-                                                            placeholder="select a date"
-                                                            title="Date"/>}
-                    {this.state.hasConsultant && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'your_peer_learning_group')}
-                                                       onChange={(v) => {this.setState({ consultantFilter: v })}}
-                                                       placeholder="select a name"
-                                                       title="Consultant" />}
+                {this.state.hasDate && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'date_of_session')}
+                                                        onChange={(v) => {this.setState({ dateFilter: v })}}
+                                                        placeholder="select a date"
+                                                        title="Date"/>}
+                {this.state.hasConsultant && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'your_peer_learning_group')}
+                                                   onChange={(v) => {this.setState({ consultantFilter: v })}}
+                                                   placeholder="select a name"
+                                                   title="Consultant" />}
 
-                    <Chart formId={this.state.filteredData} calculation={this.state.calculationMethod} />
+                <Chart formId={this.state.filteredData} calculation={this.state.calculationMethod} />
 
-                    {/*{Boolean(this.props.filtered.length) && <h4>Number of forms: {this.props.filtered.length}</h4>}*/}
-                </div>
+                {Boolean(this.state.filteredData.length) && <h4>Number of forms: {this.state.filteredData.length}</h4>}
             </div>
         );
     }

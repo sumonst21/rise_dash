@@ -1,9 +1,6 @@
 import React, {Component} from 'react';
-import { connect } from 'react-redux';
 import { Bar } from 'react-chartjs-2';
 
-
-import {selectFilteredData} from "../../selectors/selectors";
 
 const allowedCategories = {
     'participation': {
@@ -25,9 +22,9 @@ const allowedCategories = {
 };
 
 // add new qualitative sections, thoughts / feedback
-// add multiple graphs - use redux-component
 // choose columns that are shown
 // session title filterable
+// save reports?!
 
 class Chart extends Component{
     constructor (props) {
@@ -165,7 +162,7 @@ class Chart extends Component{
     render () {
         let options = {
             legend: {
-                display: true
+                display: false
             },
             scales: {
                 xAxes: [{
@@ -202,10 +199,5 @@ class Chart extends Component{
         )
     }
 }
-// function mapStateToProps(state) {
-//     return {
-//         calculation: state.filters.calculationMethod
-//     };
-// }
 
 export default Chart;
