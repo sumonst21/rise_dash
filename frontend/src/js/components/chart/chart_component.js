@@ -22,11 +22,7 @@ class ChartComponent extends Component {
         super();
         this.state = {
             unfilteredData:[],
-            form: null,
             filteredData: [],
-            calculationMethod: 'mean',
-            consultantFilter: '',
-            dateFilter: '',
             hasDate: false,
             hasConsultant: false,
         }
@@ -46,10 +42,15 @@ class ChartComponent extends Component {
     }
 
     componentWillUpdate(nextProps, nextState) {
-        if (this.state['form'] !== nextState['form']) {
-            this.fetchFormData(nextState['form'])
+        if (this.props.form !== nextProps.form) {
+            this.fetchFormData(nextProps.form);
         }
-        nextState['filteredData'] = Boolean(nextState['filteredData']) ? selectFilteredData(nextState) : []
+
+        nextState['filteredData'] = Boolean(nextState['filteredData']) ? selectFilteredData({
+            unfilteredData: nextState.unfilteredData,
+            dateFilter: nextProps.dateFilter,
+            consultantFilter: nextProps.consultantFilter
+        }) : []
     }
 
     extractFromData = (data, key_name) => {
@@ -81,25 +82,30 @@ class ChartComponent extends Component {
         return (
             <div>
                 <GenericDropdown data={ChartComponent.mapForms(formsList)}
-                                 onChange={(v) => {this.setState({ form: v })}}
+                                 onChange={(v) => {this.props.selectOption(this.props.id, 'form', v)}}
+                                 value={this.props.form}
                                  placeholder="select a form"
                                  title="Form" />
 
-                {Boolean(this.state.form) && <GenericDropdown data={['mean', 'nps']}
-                                          onChange={(v) => {this.setState({ calculationMethod: v})}}
-                                          placeholder="mean"
-                                          title="Calculation"/>}
+                {Boolean(this.props.form) && <GenericDropdown data={['mean', 'nps']}
+                                                              onChange={(v) => {this.props.selectOption(this.props.id, 'calculationMethod', v)}}
+                                                              placeholder="mean"
+                                                              value={this.props.calculationMethod}
+                                                              title="Calculation"/>}
 
                 {this.state.hasDate && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'date_of_session')}
-                                                        onChange={(v) => {this.setState({ dateFilter: v })}}
+                                                        onChange={(v) => {this.props.selectOption(this.props.id, 'dateFilter', v)}}
                                                         placeholder="select a date"
+                                                        value={this.props.dateFilter}
                                                         title="Date"/>}
-                {this.state.hasConsultant && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'your_peer_learning_group')}
-                                                   onChange={(v) => {this.setState({ consultantFilter: v })}}
-                                                   placeholder="select a name"
-                                                   title="Consultant" />}
 
-                <Chart formId={this.state.filteredData} calculation={this.state.calculationMethod} />
+                {this.state.hasConsultant && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'your_peer_learning_group')}
+                                                              onChange={(v) => {this.props.selectOption(this.props.id, 'consultantFilter', v)}}
+                                                              placeholder="select a name"
+                                                              value={this.props.consultantFilter}
+                                                              title="Consultant" />}
+
+                <Chart formId={this.state.filteredData} calculation={this.props.calculationMethod} />
 
                 {Boolean(this.state.filteredData.length) && <h4>Number of forms: {this.state.filteredData.length}</h4>}
             </div>

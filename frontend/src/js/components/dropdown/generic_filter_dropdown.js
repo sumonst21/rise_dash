@@ -20,15 +20,26 @@ class GenericDropdown extends Component {
     }
 
     render () {
-        return (
-            <div className="dropdown-block">
-                <h3 className="dropdown-label">{this.props.title}: </h3><Dropdown value={this.state.selected}
-                                                                                  options={this.props.data}
-                                                                                  onChange={this._onSelect}
-                                                                                  className="dropdown-dropdown"
-                                                                                  placeholder={this.props.placeholder} />
-            </div>
-        );
+        if (this.props.value !== undefined) {
+            return (
+                <div className="dropdown-block">
+                    <h3 className="dropdown-label">{this.props.title}: </h3><Dropdown value={this.props.value}
+                                                                                      options={this.props.data}
+                                                                                      onChange={this._onSelect}
+                                                                                      className="dropdown-dropdown"
+                                                                                      placeholder={this.props.placeholder} />
+                </div>
+            );
+        } else {
+            return (
+                <div className="dropdown-block">
+                    <h3 className="dropdown-label">{this.props.title}: </h3><Dropdown options={this.props.data}
+                                                                                      onChange={this._onSelect}
+                                                                                      className="dropdown-dropdown"
+                                                                                      placeholder={this.props.placeholder} />
+                </div>
+            );
+        }
     }
 }
 
