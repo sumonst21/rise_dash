@@ -55,9 +55,9 @@ class ChartComponent extends Component {
     }
 
     componentWillUpdate(nextProps, nextState) {
-        if (this.props.form !== nextProps.form) {
+        if (this.props.form.value !== nextProps.form.value) {
             this.setState({loading: true});
-            this.fetchFormData(nextProps.form);
+            this.fetchFormData(nextProps.form.value);
         }
 
         nextState['filteredData'] = Boolean(nextState['filteredData']) ? selectFilteredData({
@@ -91,30 +91,32 @@ class ChartComponent extends Component {
     }
 
     render () {
+        console.log({id:this.props.id, state: this.state});
+
         const { formsList } = this.props;
 
         return (
             <div>
                 <GenericDropdown data={ChartComponent.mapForms(formsList)}
                                  onChange={(v) => {this.props.selectOption(this.props.id, 'form', v)}}
-                                 value={this.props.form}
+                                 value={this.props.form.label}
                                  placeholder="select a form"
                                  title="Form" />
 
                 {Boolean(this.props.form) && <GenericDropdown data={['mean', 'nps']}
-                                                              onChange={(v) => {this.props.selectOption(this.props.id, 'calculationMethod', v)}}
+                                                              onChange={(v) => {this.props.selectOption(this.props.id, 'calculationMethod', v.value)}}
                                                               placeholder="mean"
                                                               value={this.props.calculationMethod}
                                                               title="Calculation"/>}
 
                 {this.state.hasDate && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'date_of_session')}
-                                                        onChange={(v) => {this.props.selectOption(this.props.id, 'dateFilter', v)}}
+                                                        onChange={(v) => {this.props.selectOption(this.props.id, 'dateFilter', v.value)}}
                                                         placeholder="select a date"
                                                         value={this.props.dateFilter}
                                                         title="Date"/>}
 
                 {this.state.hasConsultant && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'consultant_name')}
-                                                              onChange={(v) => {this.props.selectOption(this.props.id, 'consultantFilter', v)}}
+                                                              onChange={(v) => {this.props.selectOption(this.props.id, 'consultantFilter', v.value)}}
                                                               placeholder="select a name"
                                                               value={this.props.consultantFilter}
                                                               title="Consultant" />}

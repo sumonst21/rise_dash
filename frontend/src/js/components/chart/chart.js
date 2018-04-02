@@ -34,7 +34,7 @@ class Chart extends Component{
                 labels: ['a', 'b'],
                 datasets: [{
                     label: "data",
-                    data:[2, 5],
+                    data:[],
                     backgroundColor: "rgba(213, 50, 99, 0.3)",
                     borderColor: "rgba(213, 50, 99, 0.8)",
                     borderWidth: 2
@@ -154,6 +154,8 @@ class Chart extends Component{
         }
         chartData.datasets[0].backgroundColor = groupedData.backgroundColors;
         chartData.datasets[0].borderColor = groupedData.borderColors;
+
+        console.log(chartData);
 
         this.setState({chartData: chartData})
 

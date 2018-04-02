@@ -6,11 +6,14 @@ import ChartComponent from '../chart/chart_component';
 import {fetchFilters} from "../../actions";
 
 
+const blankChartState = {form: {value: null, label: null}, calculationMethod: 'mean', dateFilter: '', consultantFilter: ''};
+
+
 class Main extends Component {
     constructor() {
         super();
         this.state = {
-            charts: [{'id': 1, 'form': null, calculationMethod: 'mean', dateFilter: '', consultantFilter: ''}],
+            charts: [Object.assign({id: 1}, blankChartState)],
         }
     };
 
@@ -19,7 +22,7 @@ class Main extends Component {
     }
 
     handleMoreChartsClick () {
-        this.setState({ charts: this.state.charts.concat([{'id': uuid.v4()}])})
+        this.setState({ charts: this.state.charts.concat([Object.assign({id: uuid.v4()}, blankChartState)])})
     }
 
     handleLessChartsClick(id) {

@@ -13,7 +13,7 @@ class GenericDropdown extends Component {
     }
 
     _onSelect (option) {
-        this.props.onChange(option.value);
+        this.props.onChange(option);
         this.setState({
             selected: option.label
         })
