@@ -25,6 +25,7 @@ class ChartComponent extends Component {
             filteredData: [],
             hasDate: false,
             hasConsultant: false,
+            loading: false
         }
     };
 
@@ -35,7 +36,8 @@ class ChartComponent extends Component {
                 this.setState({
                     unfilteredData: response.data,
                     hasDate: response.data[0].hasOwnProperty('date_of_session'),
-                    hasConsultant: response.data[0].hasOwnProperty('your_peer_learning_group')
+                    hasConsultant: response.data[0].hasOwnProperty('your_peer_learning_group'),
+                    loading: false
                 })
             }
         )
@@ -43,6 +45,7 @@ class ChartComponent extends Component {
 
     componentWillUpdate(nextProps, nextState) {
         if (this.props.form !== nextProps.form) {
+            this.setState({loading: true});
             this.fetchFormData(nextProps.form);
         }
 
@@ -105,7 +108,7 @@ class ChartComponent extends Component {
                                                               value={this.props.consultantFilter}
                                                               title="Consultant" />}
 
-                <Chart formId={this.state.filteredData} calculation={this.props.calculationMethod} />
+                <Chart formId={this.state.filteredData} calculation={this.props.calculationMethod} loading={this.state.loading} />
 
                 {Boolean(this.state.filteredData.length) && <h4>Number of forms: {this.state.filteredData.length}</h4>}
             </div>
