@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
-import { connect } from 'react-redux';
 import { Bar } from 'react-chartjs-2';
 
-import {selectFilteredData} from "../../selectors/selectors";
 
 const allowedCategories = {
     'participation': {
@@ -13,7 +11,7 @@ const allowedCategories = {
         'border': 'rgba(129, 210, 209, 1)',
         'background': 'rgba(129, 210, 209, 0.3)'
     },
-    'designcontent': {
+    'value': {
         'border': 'rgba(213, 50, 99, 0.8)',
         'background': 'rgba(213, 50, 99, 0.3)'
     },
@@ -23,11 +21,15 @@ const allowedCategories = {
     }
 };
 
+// add new qualitative sections, thoughts / feedback
+// choose columns that are shown
+// session title filterable
+// save reports?!
 
 class Chart extends Component{
     constructor (props) {
         super(props);
-        this.state ={
+        this.state = {
             chartData: {
                 labels: ['a', 'b'],
                 datasets: [{
@@ -41,7 +43,7 @@ class Chart extends Component{
         }
     }
 
-    extractData (rawData) {
+    static extractData (rawData) {
         let values = {};
 
         for (let i = 0; i < rawData.length; i++) {
@@ -130,7 +132,7 @@ class Chart extends Component{
 
     componentWillReceiveProps (nextProps) {
         const calculationMethod = nextProps.calculation;
-        const values = this.extractData(nextProps.formId);
+        const values = Chart.extractData(nextProps.formId);
         const groupedData = this.group_data(values);
 
         let chartData = Object.assign({}, this.state.chartData);
@@ -189,18 +191,17 @@ class Chart extends Component{
             options['scales']['yAxes'][0]['ticks']['max'] = 10;
         }
 
-        return (
-            <div className="chart">
-                {Boolean(this.props.formId.length) && <Bar data={this.state.chartData}
-                                                    options={options}/>}
-            </div>
-        )
+        if (this.props.loading) {
+            return <div>Loading data</div>
+        } else {
+            return (
+                <div className="chart">
+                    {Boolean(this.props.formId.length) && <Bar data={this.state.chartData}
+                                                        options={options}/>}
+                </div>
+            )
+        }
     }
 }
-function mapStateToProps(state) {
-    return {
-        calculation: state.filters.calculationMethod
-    };
-}
 
-export default connect(mapStateToProps, {})(Chart);
+export default Chart;
