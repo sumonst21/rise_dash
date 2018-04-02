@@ -29,14 +29,25 @@ class ChartComponent extends Component {
         }
     };
 
-    fetchFormData (formId) {
+    static renameOldFields(data) {
+        // Some fields were called differently previously
+        data.forEach((item) => {
+            if (item.hasOwnProperty('your_peer_learning_group')) {
+                item['consultant_name'] = item['your_peer_learning_group'];
+                delete item['your_peer_learning_group'];
+            }
+        });
+        return data
+    }
+
+    fetchFormData(formId) {
         const url = `${API_URL}${formId}/`;
         axios.get(url, {headers: getHeaders()}).then(
             (response) => {
                 this.setState({
-                    unfilteredData: response.data,
+                    unfilteredData: ChartComponent.renameOldFields(response.data),
                     hasDate: response.data[0].hasOwnProperty('date_of_session'),
-                    hasConsultant: response.data[0].hasOwnProperty('your_peer_learning_group'),
+                    hasConsultant: response.data[0].hasOwnProperty('consultant_name'),
                     loading: false
                 })
             }
@@ -102,7 +113,7 @@ class ChartComponent extends Component {
                                                         value={this.props.dateFilter}
                                                         title="Date"/>}
 
-                {this.state.hasConsultant && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'your_peer_learning_group')}
+                {this.state.hasConsultant && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'consultant_name')}
                                                               onChange={(v) => {this.props.selectOption(this.props.id, 'consultantFilter', v)}}
                                                               placeholder="select a name"
                                                               value={this.props.consultantFilter}

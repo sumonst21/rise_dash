@@ -25,7 +25,7 @@ export const selectFilteredData = createSelector(
     selectDateFilter,
     selectConsultantFilter,
     (data, dateFilter, consultantFilter) => {
-        const filter = {date_of_session: dateFilter, your_peer_learning_group: consultantFilter};
+        const filter = {date_of_session: dateFilter, consultant_name: consultantFilter};
 
         return data.filter((item) => {
             for (let key in filter) {
