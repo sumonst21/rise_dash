@@ -111,7 +111,7 @@ class ChartComponent extends Component {
                                  placeholder="select a form"
                                  title="Form" />
 
-                {Boolean(this.props.form) && <GenericDropdown data={['mean', 'nps']}
+                {Boolean(this.state.filteredData.length) && <GenericDropdown data={['mean', 'nps']}
                                                               onChange={(v) => {this.props.selectOption(this.props.id, 'calculationMethod', v.value)}}
                                                               placeholder="mean"
                                                               value={this.props.calculationMethod}
@@ -133,7 +133,7 @@ class ChartComponent extends Component {
 
                 {Boolean(this.state.filteredData.length) && <h4>Number of forms: {this.state.filteredData.length}</h4>}
 
-                <button onClick={() => {return this.handleShowComments()}} >{this.state.showComments ? 'Hide': 'Show'} Comments</button>
+                {Boolean(this.state.filteredData.length) && <button onClick={() => {return this.handleShowComments()}} >{this.state.showComments ? 'Hide': 'Show'} Comments</button>}
                 {this.state.showComments && <Comments data={this.state.filteredData}/>}
             </div>
         );
