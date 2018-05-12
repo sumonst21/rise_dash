@@ -59,7 +59,11 @@ class Main extends Component {
         return this.state.charts.map((item) => {
             return (
                 <div key={item.id} className="generic-card" >
-                    <button className="generic-card-close" onClick={() => {return this.handleLessChartsClick(item.id)}} >x</button>
+                    <button className="generic-card-close btn-floating cyan" onClick={() => {return this.handleLessChartsClick(item.id)}} >
+                        <i className="material-icons">
+                            close
+                        </i>
+                    </button>
                     <ChartComponent formsList={this.props.formList} id={item.id}
                                     form={item.form}
                                     calculationMethod={item.calculationMethod}
@@ -76,7 +80,11 @@ class Main extends Component {
         return (
             <div>
                 {this.renderCharts()}
-                <button onClick={() => {return this.handleMoreChartsClick()}} >Add Chart</button>
+                <button className="new-chart-button btn-floating cyan" onClick={() => {return this.handleMoreChartsClick()}} >
+                    <i className="material-icons">
+                        add
+                    </i>
+                </button>
             </div>
         );
     }

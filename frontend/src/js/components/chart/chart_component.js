@@ -129,11 +129,16 @@ class ChartComponent extends Component {
                                                               value={this.props.consultantFilter}
                                                               title="Consultant" />}
 
-                <Chart formId={this.state.filteredData} calculation={this.props.calculationMethod} loading={this.state.loading} />
+                <Chart formId={this.state.filteredData} calculation={this.props.calculationMethod}
+                       loading={this.state.loading}/>
 
                 {Boolean(this.state.filteredData.length) && <h4>Number of forms: {this.state.filteredData.length}</h4>}
 
-                {Boolean(this.state.filteredData.length) && <button onClick={() => {return this.handleShowComments()}} >{this.state.showComments ? 'Hide': 'Show'} Comments</button>}
+                {Boolean(this.state.filteredData.length) && <button
+                    className="waves-effect btn cyan" onClick={() => {
+                    return this.handleShowComments()
+                }}><i className="text-icon-fix material-icons right">{this.state.showComments ? 'expand_less' : 'expand_more'}</i> Comments</button>}
+
                 {this.state.showComments && <Comments data={this.state.filteredData}/>}
             </div>
         );
