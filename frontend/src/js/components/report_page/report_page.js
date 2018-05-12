@@ -59,13 +59,14 @@ class Main extends Component {
         return this.state.charts.map((item) => {
             return (
                 <div key={item.id} className="generic-card" >
+                    <button className="generic-card-close" onClick={() => {return this.handleLessChartsClick(item.id)}} >x</button>
                     <ChartComponent formsList={this.props.formList} id={item.id}
                                     form={item.form}
                                     calculationMethod={item.calculationMethod}
                                     dateFilter={item.dateFilter}
                                     consultantFilter={item.consultantFilter}
-                                    selectOption={(id, key, value) => {this.selectOption(id, key, value)}} />
-                    <button onClick={() => {return this.handleLessChartsClick(item.id)}} >Remove Chart</button>
+                                    selectOption={(id, key, value) => {this.selectOption(id, key, value)}}
+                    />
                 </div>
             );
         });
