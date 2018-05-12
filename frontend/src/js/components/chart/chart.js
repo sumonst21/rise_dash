@@ -155,8 +155,6 @@ class Chart extends Component{
         chartData.datasets[0].backgroundColor = groupedData.backgroundColors;
         chartData.datasets[0].borderColor = groupedData.borderColors;
 
-        console.log(chartData);
-
         this.setState({chartData: chartData})
 
     }

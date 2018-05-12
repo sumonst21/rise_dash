@@ -5,6 +5,7 @@ import { selectFilteredData } from "../../selectors/selectors";
 import GenericDropdown from '../dropdown/generic_filter_dropdown';
 import Chart from '../chart/chart';
 import axios from "axios/index";
+import Comments from './comments';
 
 const API_URL = `${process.env.BASE_API_URL}/form_data/`;
 
@@ -25,7 +26,8 @@ class ChartComponent extends Component {
             filteredData: [],
             hasDate: false,
             hasConsultant: false,
-            loading: false
+            loading: false,
+            showComments: false
         }
     };
 
@@ -88,6 +90,12 @@ class ChartComponent extends Component {
                 return {'value': form.id, 'label': index + ' ' + form.name}
             }
         ).filter(n => n)
+    };
+
+    handleShowComments () {
+        this.setState({
+            showComments: !this.state.showComments
+        })
     }
 
     render () {
@@ -124,6 +132,9 @@ class ChartComponent extends Component {
                 <Chart formId={this.state.filteredData} calculation={this.props.calculationMethod} loading={this.state.loading} />
 
                 {Boolean(this.state.filteredData.length) && <h4>Number of forms: {this.state.filteredData.length}</h4>}
+
+                <button onClick={() => {return this.handleShowComments()}} >{this.state.showComments ? 'Hide': 'Show'} Comments</button>
+                {this.state.showComments && <Comments data={this.state.filteredData}/>}
             </div>
         );
     }
