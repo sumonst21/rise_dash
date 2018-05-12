@@ -65,7 +65,7 @@ class Main extends Component {
                                     dateFilter={item.dateFilter}
                                     consultantFilter={item.consultantFilter}
                                     selectOption={(id, key, value) => {this.selectOption(id, key, value)}} />
-                    <button onClick={() => {return this.handleLessChartsClick(item.id)}} >Remove</button>
+                    <button onClick={() => {return this.handleLessChartsClick(item.id)}} >Remove Chart</button>
                 </div>
             );
         });

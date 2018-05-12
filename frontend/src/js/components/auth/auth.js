@@ -20,7 +20,6 @@ function getToken (username, pass, cb) {
 
     axios.post(API_URL, data).then(
         function (response) {
-            console.log(response);
             cb({
                 authenticated: true,
                 token: response.data.token
