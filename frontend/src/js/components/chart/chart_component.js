@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import { connect } from 'react-redux';
 
 import { selectFilteredData } from "../../selectors/selectors";
 import GenericDropdown from '../dropdown/generic_filter_dropdown';
@@ -27,7 +26,8 @@ class ChartComponent extends Component {
             hasDate: false,
             hasConsultant: false,
             loading: false,
-            showComments: false
+            showComments: false,
+            filterableKeys: new Set()
         }
     };
 
@@ -42,6 +42,18 @@ class ChartComponent extends Component {
         return data
     }
 
+
+    static getFilterableKeys(data) {
+        let keys = new Set();
+
+        data.forEach((item) => {
+            let newKeySet = new Set(Object.keys(item));
+            keys = new Set([...keys, ...newKeySet])
+        });
+
+        return keys
+    }
+
     fetchFormData(formId) {
         const url = `${API_URL}${formId}/`;
         axios.get(url, {headers: getHeaders()}).then(
@@ -50,6 +62,7 @@ class ChartComponent extends Component {
                     unfilteredData: ChartComponent.renameOldFields(response.data),
                     hasDate: response.data[0].hasOwnProperty('date_of_session'),
                     hasConsultant: response.data[0].hasOwnProperty('consultant_name'),
+                    filterableKeys: ChartComponent.getFilterableKeys(response.data),
                     loading: false
                 })
             }
@@ -65,7 +78,8 @@ class ChartComponent extends Component {
         nextState['filteredData'] = Boolean(nextState['filteredData']) ? selectFilteredData({
             unfilteredData: nextState.unfilteredData,
             dateFilter: nextProps.dateFilter,
-            consultantFilter: nextProps.consultantFilter
+            consultantFilter: nextProps.consultantFilter,
+            genericFilters: nextProps.genericFilters
         }) : []
     }
 
@@ -99,12 +113,18 @@ class ChartComponent extends Component {
     }
 
     render () {
-        console.log({id:this.props.id, state: this.state});
-
         const { formsList } = this.props;
 
         return (
             <div>
+                <button className="generic-card-close btn-floating cyan" onClick={() => {
+                    this.setState({loading: true});
+                    this.fetchFormData(this.props.form.value)
+                }} >
+                    <i className="material-icons">
+                        refresh
+                    </i>
+                </button>
                 <GenericDropdown data={ChartComponent.mapForms(formsList)}
                                  onChange={(v) => {this.props.selectOption(this.props.id, 'form', v)}}
                                  value={this.props.form.label}
@@ -129,6 +149,22 @@ class ChartComponent extends Component {
                                                               value={this.props.consultantFilter}
                                                               title="Consultant" />}
 
+                {this.state.filterableKeys.has('user') && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'user')}
+                                                                           onChange={(v) => {
+                                                                               this.props.selectGenericFilter(this.props.id, 'user', v.value)
+                                                                           }}
+                                                                           placeholder="select a user"
+                                                                           value={this.props.genericFilters.user}
+                                                                           title="user"/>}
+
+                {this.state.filterableKeys.has('exec_member') && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'exec_member')}
+                                                                                       onChange={(v) => {
+                                                                                           this.props.selectGenericFilter(this.props.id, 'exec_member', v.value)
+                                                                                       }}
+                                                                                       placeholder="select a participant"
+                                                                                       value={this.props.genericFilters.exec_member}
+                                                                                       title="Participant"/>}
+
                 <Chart formId={this.state.filteredData} calculation={this.props.calculationMethod}
                        loading={this.state.loading}/>
 
@@ -140,6 +176,7 @@ class ChartComponent extends Component {
                 }}><i className="text-icon-fix material-icons right">{this.state.showComments ? 'expand_less' : 'expand_more'}</i> Comments</button>}
 
                 {this.state.showComments && <Comments data={this.state.filteredData}/>}
+
             </div>
         );
     }

@@ -6,7 +6,13 @@ import ChartComponent from '../chart/chart_component';
 import {fetchFilters} from "../../actions";
 
 
-const blankChartState = {form: {value: null, label: null}, calculationMethod: 'mean', dateFilter: '', consultantFilter: ''};
+const blankChartState = {
+    form: {value: null, label: null},
+    calculationMethod: 'mean',
+    dateFilter: '',
+    consultantFilter: '',
+    genericFilters: {},
+};
 
 
 class Main extends Component {
@@ -50,6 +56,29 @@ class Main extends Component {
         if (key === 'form') {
             oldChart.dateFilter = '';
             oldChart.consultantFilter = '';
+            oldChart.genericFilters = {};
+        }
+
+        this.setState({charts: chartsCopy})
+    }
+
+    selectFilter(id, key, value) {
+        let chartsCopy = this.state.charts.slice();
+        let oldChart = null;
+
+        for (let chart in chartsCopy) {
+            if (chartsCopy[chart].id === id) {
+                oldChart = chartsCopy[chart];
+                break
+            }
+        }
+
+        oldChart['genericFilters'][key] = value;
+
+        // if form is changing then reset filters
+        if (key === 'form') {
+            oldChart.dateFilter = '';
+            oldChart.consultantFilter = '';
         }
 
         this.setState({charts: chartsCopy})
@@ -69,6 +98,8 @@ class Main extends Component {
                                     calculationMethod={item.calculationMethod}
                                     dateFilter={item.dateFilter}
                                     consultantFilter={item.consultantFilter}
+                                    genericFilters={item.genericFilters}
+                                    selectGenericFilter={(id, key, value) => {this.selectFilter(id, key, value)}}
                                     selectOption={(id, key, value) => {this.selectOption(id, key, value)}}
                     />
                 </div>

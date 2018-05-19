@@ -192,6 +192,7 @@ body {
 .generic-card-close {
     float: right;
     display:inline-block;
+    margin-left: 20px;
 }
 
 .post {

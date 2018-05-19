@@ -20,16 +20,26 @@ const selectConsultantFilter = (state) => {
     }
 };
 
+const selectGenericFilters = (state) => {
+    return Object.assign({}, state.genericFilters)
+};
+
 export const selectFilteredData = createSelector(
-    selectData,
+    [selectData,
     selectDateFilter,
     selectConsultantFilter,
-    (data, dateFilter, consultantFilter) => {
+    selectGenericFilters],
+    (data, dateFilter, consultantFilter, selectGenericFilters) => {
         const filter = {date_of_session: dateFilter, consultant_name: consultantFilter};
+
+        Object.assign(filter, selectGenericFilters);
 
         return data.filter((item) => {
             for (let key in filter) {
-                if (filter[key] && (item[key] === undefined || item[key] !== filter[key])) {
+                if (filter[key] === 'no_filter') {
+                    return true;
+                }
+                else if (filter[key] && (item[key] === undefined || item[key] !== filter[key])) {
                     return false;
                 }
             }
