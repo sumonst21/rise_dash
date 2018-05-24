@@ -139,9 +139,13 @@ class ChartComponent extends Component {
     renderFilters(dataset, index) {
         return (
             <div key={index} >
-                <button className={"filterset-button waves-effect btn cyan"} onClick={() => {this.handleShowFilters(index)}} >
+                <button
+                    className={"filterset-button waves-effect btn cyan"}
+                    onClick={() => {this.handleShowFilters(index)}}
+                    title={'show filters for this dataset'}
+                >
                     <i className="text-icon-fix material-icons right" style={{color: dataset.border}}> brightness_1 </i>
-                    filterset {index}
+                    dataset {index}
                 </button>
 
                 {this.state.showFiltersets.includes(index) && <div>
