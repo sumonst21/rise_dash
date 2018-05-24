@@ -21,7 +21,6 @@ const allowedCategories = {
     }
 };
 
-// add new qualitative sections, thoughts / feedback
 // choose columns that are shown
 // session title filterable
 // save reports?!
@@ -111,7 +110,7 @@ class Chart extends Component{
                     (item) => {
                         backgroundColors.push(allowedCategories[key]['background']);
                         borderColors.push(allowedCategories[key]['border']);
-                        return item.split('_')
+                        return item
                     }
                 );
                 const dataSet = Object.values(dataDict[key]);
@@ -131,31 +130,41 @@ class Chart extends Component{
     }
 
     componentWillReceiveProps (nextProps) {
-        const calculationMethod = nextProps.calculation;
-        const values = Chart.extractData(nextProps.formId);
-        const groupedData = this.group_data(values);
-
+        let labelSet = new Set();
         let chartData = Object.assign({}, this.state.chartData);
+        const calculationMethod = nextProps.calculationMethod;
 
-        chartData.labels = groupedData.labels;
+        console.log(nextProps);
 
-        if (calculationMethod === 'mean') {
-            chartData.datasets[0].data = Object.values(groupedData.data).map(
-                item => {
-                    return item.score / item.count
-                }
-            );
-        } else if (calculationMethod === 'nps') {
-            chartData.datasets[0].data = Object.values(groupedData.data).map(
-                item => {
-                    return ((item.promoters - item.detractors) / item.count) * 100
-                }
-            );
-        }
-        chartData.datasets[0].backgroundColor = groupedData.backgroundColors;
-        chartData.datasets[0].borderColor = groupedData.borderColors;
+        nextProps.formId.forEach((chartDataset, index) => {
+            chartData.datasets[index] = { borderWidth: 2 };
+            const values = Chart.extractData(chartDataset.data);
+            const groupedData = this.group_data(values);
 
-        this.setState({chartData: chartData})
+            groupedData.labels.forEach((label) => {labelSet.add(label)});
+
+            if (calculationMethod === 'mean') {
+                chartData.datasets[index].data = Object.values(groupedData.data).map(
+                    item => {
+                        return item.score / item.count
+                    }
+                );
+            } else if (calculationMethod === 'nps') {
+                chartData.datasets[index].data = Object.values(groupedData.data).map(
+                    item => {
+                        return ((item.promoters - item.detractors) / item.count) * 100
+                    }
+                );
+            }
+
+            chartData.datasets[index].backgroundColor = chartDataset.background;
+            chartData.datasets[index].borderColor = chartDataset.border;
+            chartData.datasets[index].label = `dataset ${index}`;
+        });
+
+        let labels = [...labelSet];
+        chartData.labels = labels.map((x) => {return x.split('_')});
+        this.setState({chartData: chartData});
 
     }
 
@@ -183,7 +192,7 @@ class Chart extends Component{
             }
         };
 
-        if (this.props.calculation === 'nps') {
+        if (this.props.calculationMethod === 'nps') {
             options['scales']['yAxes'][0]['ticks']['min'] = -100;
             options['scales']['yAxes'][0]['ticks']['max'] = 100;
         } else {
