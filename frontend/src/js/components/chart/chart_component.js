@@ -27,7 +27,8 @@ class ChartComponent extends Component {
             hasConsultant: false,
             loading: false,
             showComments: false,
-            filterableKeys: new Set()
+            filterableKeys: new Set(),
+            showFiltersets: []
         }
     };
 
@@ -125,44 +126,62 @@ class ChartComponent extends Component {
         })
     }
 
+    handleShowFilters(filterset) {
+        this.setState(
+            {
+                showFiltersets: this.state.showFiltersets.includes(filterset) ? this.state.showFiltersets.filter(
+                    (x) => {return x !== filterset}
+                ) : this.state.showFiltersets.concat([filterset])
+            }
+        )
+    }
+
     renderFilters(dataset, index) {
         return (
-            <div key={index}>
-                {this.state.hasDate &&
-                <GenericDropdown data={this.extractFromData(dataset, 'date_of_session')}
-                                 onChange={(v) => {
-                                     this.props.selectOption(this.props.id, index, 'dateFilter', v.value)
-                                 }}
-                                 placeholder="select a date"
-                                 value={this.props.datasets[index].dateFilter}
-                                 title="Date"/>}
+            <div key={index} >
+                <button className={"filterset-button waves-effect btn cyan"} onClick={() => {this.handleShowFilters(index)}} >
+                    <i className="text-icon-fix material-icons right" style={{color: dataset.border}}> brightness_1 </i>
+                    filterset {index}
+                </button>
 
-                {this.state.hasConsultant &&
-                <GenericDropdown data={this.extractFromData(dataset, 'consultant_name')}
-                                 onChange={(v) => {
-                                     this.props.selectOption(this.props.id, index, 'consultantFilter', v.value)
-                                 }}
-                                 placeholder="select a name"
-                                 value={this.props.datasets[index].consultantFilter}
-                                 title="Consultant"/>}
+                {this.state.showFiltersets.includes(index) && <div>
+                    {this.state.hasDate &&
+                    <GenericDropdown data={this.extractFromData(dataset.data, 'date_of_session')}
+                                     onChange={(v) => {
+                                         this.props.selectOption(this.props.id, index, 'dateFilter', v.value)
+                                     }}
+                                     placeholder="select a date"
+                                     value={this.props.datasets[index].dateFilter}
+                                     title="Date"/>}
 
-                {this.state.filterableKeys.has('user') &&
-                <GenericDropdown data={this.extractFromData(dataset, 'user')}
-                                 onChange={(v) => {
-                                     this.props.selectGenericFilter(this.props.id, index, 'user', v.value)
-                                 }}
-                                 placeholder="select a user"
-                                 value={this.props.datasets[index].genericFilters.user}
-                                 title="user"/>}
+                    {this.state.hasConsultant &&
+                    <GenericDropdown data={this.extractFromData(dataset.data, 'consultant_name')}
+                                     onChange={(v) => {
+                                         this.props.selectOption(this.props.id, index, 'consultantFilter', v.value)
+                                     }}
+                                     placeholder="select a name"
+                                     value={this.props.datasets[index].consultantFilter}
+                                     title="Consultant"/>}
 
-                {this.state.filterableKeys.has('exec_member') &&
-                <GenericDropdown data={this.extractFromData(dataset, 'exec_member')}
-                                 onChange={(v) => {
-                                     this.props.selectGenericFilter(this.props.id, index, 'exec_member', v.value)
-                                 }}
-                                 placeholder="select a participant"
-                                 value={this.props.datasets[index].genericFilters.exec_member}
-                                 title="Participant"/>}
+                    {this.state.filterableKeys.has('user') &&
+                    <GenericDropdown data={this.extractFromData(dataset.data, 'user')}
+                                     onChange={(v) => {
+                                         this.props.selectGenericFilter(this.props.id, index, 'user', v.value)
+                                     }}
+                                     placeholder="select a user"
+                                     value={this.props.datasets[index].genericFilters.user}
+                                     title="user"/>}
+
+                    {this.state.filterableKeys.has('exec_member') &&
+                    <GenericDropdown data={this.extractFromData(dataset.data, 'exec_member')}
+                                     onChange={(v) => {
+                                         this.props.selectGenericFilter(this.props.id, index, 'exec_member', v.value)
+                                     }}
+                                     placeholder="select a participant"
+                                     value={this.props.datasets[index].genericFilters.exec_member}
+                                     title="Participant"/>}
+
+                </div>}
             </div>
         )
     }
@@ -173,14 +192,19 @@ class ChartComponent extends Component {
 
         return (
             <div>
-                <button className="generic-card-close btn-floating cyan" onClick={() => {
-                    this.setState({loading: true});
-                    this.fetchFormData(this.props.form.value, this.props.datasets)
-                }} >
+                {this.props.form.value &&
+                <button
+                    className="generic-card-close btn-floating cyan"
+                    onClick={() => {
+                        this.setState({loading: true});
+                        this.fetchFormData(this.props.form.value, this.props.datasets)
+                    }}
+                    title={"refresh chart data"}
+                >
                     <i className="material-icons">
                         refresh
                     </i>
-                </button>
+                </button>}
                 <GenericDropdown data={ChartComponent.mapForms(formsList)}
                                  onChange={(v) => {this.props.selectOption(this.props.id, 0, 'form', v)}}
                                  value={this.props.form.label}
@@ -196,11 +220,13 @@ class ChartComponent extends Component {
                                  value={this.props.calculationMethod}
                                  title="Calculation"/>}
 
-                {
-                    this.state.filteredDatasets.map((dataset, index) => {
-                        return this.renderFilters(dataset.data, index)
-                    })
-                }
+                {this.props.form.value && <div className={"generic-card-filterset"}>
+                    {
+                        this.state.filteredDatasets.map((dataset, index) => {
+                            return this.renderFilters(dataset, index)
+                        })
+                    }
+                </div>}
 
                 {this.props.form.value && <Chart formId={this.state.filteredDatasets} calculationMethod={this.props.calculationMethod}
                        loading={this.state.loading}/>}

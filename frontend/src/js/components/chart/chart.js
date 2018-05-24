@@ -131,10 +131,8 @@ class Chart extends Component{
 
     componentWillReceiveProps (nextProps) {
         let labelSet = new Set();
-        let chartData = Object.assign({}, this.state.chartData);
+        let chartData = {datasets: [], labels :[]};
         const calculationMethod = nextProps.calculationMethod;
-
-        console.log(nextProps);
 
         nextProps.formId.forEach((chartDataset, index) => {
             chartData.datasets[index] = { borderWidth: 2 };

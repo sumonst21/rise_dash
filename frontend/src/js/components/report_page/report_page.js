@@ -66,6 +66,20 @@ class Main extends Component {
         this.setState({charts: charts})
     }
 
+    handleLessDataSetsClick(id) {
+        let charts = this.state.charts.slice();
+
+        charts.map(
+            (chart) => {
+                if (chart.id === id) {
+                    chart.datasets.pop();
+                }
+            }
+        );
+
+        this.setState({charts: charts})
+    }
+
 
     handleMoreChartsClick () {
         this.setState({ charts: this.state.charts.concat([Object.assign({id: uuid.v4()}, blankChartState)])})
@@ -131,18 +145,45 @@ class Main extends Component {
         return this.state.charts.map((item) => {
             return (
                 <div key={item.id} className="generic-card" >
-                    <button className="generic-card-close btn-floating cyan" onClick={() => {return this.handleLessChartsClick(item.id)}} >
+                    <button
+                        className="generic-card-close btn-floating cyan"
+                        onClick={() => {return this.handleLessChartsClick(item.id)}}
+                        title={"close chart"}
+                    >
                         <i className="material-icons">
                             close
                         </i>
                     </button>
-                    <button onClick={() => {this.handleMoreDatasetsClick(item.id)}}> new ds </button>
-                    <ChartComponent formsList={this.props.formList} id={item.id}
-                                    form={item.form}
-                                    datasets={item.datasets}
-                                    calculationMethod={item.calculationMethod}
-                                    selectGenericFilter={(chartId, datasetIndex, key, value) => {this.selectFilter(chartId, datasetIndex, key, value)}}
-                                    selectOption={(chartId, datasetIndex, key, value) => {this.selectOption(chartId, datasetIndex, key, value)}}
+
+                    {item.form.value &&
+                    <button
+                        className={"generic-card-close btn-floating cyan"}
+                        onClick={() => {this.handleMoreDatasetsClick(item.id)}}
+                        title={"add another dataset to this chart"}
+                    >
+                        <i className="material-icons">
+                            add
+                        </i>
+                    </button>}
+
+                    {item.form.value &&
+                    <button
+                        className={"generic-card-close btn-floating cyan"}
+                        onClick={() => {this.handleLessDataSetsClick(item.id)}}
+                        title={"remove a dataset from this chart"}
+                    >
+                        <i className="material-icons">
+                            remove
+                        </i>
+                    </button>}
+
+                    <ChartComponent
+                        formsList={this.props.formList} id={item.id}
+                        form={item.form}
+                        datasets={item.datasets}
+                        calculationMethod={item.calculationMethod}
+                        selectGenericFilter={(chartId, datasetIndex, key, value) => {this.selectFilter(chartId, datasetIndex, key, value)}}
+                        selectOption={(chartId, datasetIndex, key, value) => {this.selectOption(chartId, datasetIndex, key, value)}}
                     />
                 </div>
             );
@@ -153,7 +194,11 @@ class Main extends Component {
         return (
             <div>
                 {this.renderCharts()}
-                <button className="new-chart-button btn-floating cyan" onClick={() => {return this.handleMoreChartsClick()}} >
+                <button
+                    className="new-chart-button btn-floating cyan"
+                    onClick={() => {return this.handleMoreChartsClick()}}
+                    title={"add a new chart"}
+                >
                     <i className="material-icons">
                         add
                     </i>
