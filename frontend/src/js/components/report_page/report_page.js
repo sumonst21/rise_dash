@@ -9,10 +9,27 @@ import {fetchFilters} from "../../actions";
 const blankChartState = {
     form: {value: null, label: null},
     calculationMethod: 'mean',
-    dateFilter: '',
-    consultantFilter: '',
-    genericFilters: {},
+    datasets: [{
+        dateFilter: '',
+        consultantFilter: '',
+        genericFilters: {},
+        background: "rgba(213, 50, 99, 0.3)",
+        border: "rgba(213, 50, 99, 0.8)",
+    }]
 };
+
+
+function rgba(r, g, b, alpha) {
+    let o = Math.round, s = 255;
+    return 'rgba(' + o(r*s) + ',' + o(g*s) + ',' + o(b*s) + ',' + alpha + ')';
+}
+
+function generateColours() {
+    const r = Math.random();
+    const g = Math.random();
+    const b = Math.random();
+    return {border: rgba(r, g, b, 0.8), background: rgba(r, g, b, 0.3)}
+}
 
 
 class Main extends Component {
@@ -23,9 +40,46 @@ class Main extends Component {
         }
     };
 
-    componentWillMount () {
+    componentWillMount() {
         this.props.fetchFilters();
     }
+
+    handleMoreDatasetsClick(id) {
+        let charts = this.state.charts.slice();
+
+        charts.map(
+            (chart) => {
+                if (chart.id === id) {
+                    const { border, background } = generateColours();
+
+                    chart.datasets = [...chart.datasets, {
+                        dateFilter: '',
+                        consultantFilter: '',
+                        genericFilters: {},
+                        border: border,
+                        background: background
+                    }];
+                }
+            }
+        );
+
+        this.setState({charts: charts})
+    }
+
+    handleLessDataSetsClick(id) {
+        let charts = this.state.charts.slice();
+
+        charts.map(
+            (chart) => {
+                if (chart.id === id) {
+                    chart.datasets.pop();
+                }
+            }
+        );
+
+        this.setState({charts: charts})
+    }
+
 
     handleMoreChartsClick () {
         this.setState({ charts: this.state.charts.concat([Object.assign({id: uuid.v4()}, blankChartState)])})
@@ -39,48 +93,51 @@ class Main extends Component {
         })
     }
 
-    selectOption(id, key, value) {
+    selectOption(chartId, datasetIndex, key, value) {
         let chartsCopy = this.state.charts.slice();
         let oldChart = null;
 
         for (let chart in chartsCopy) {
-            if (chartsCopy[chart].id === id) {
+            if (chartsCopy[chart].id === chartId) {
                 oldChart = chartsCopy[chart];
                 break
             }
         }
 
-        oldChart[key] = value;
-
         // if form is changing then reset filters
         if (key === 'form') {
-            oldChart.dateFilter = '';
-            oldChart.consultantFilter = '';
-            oldChart.genericFilters = {};
+            Object.assign(oldChart, {
+                form: value,
+                calculationMethod: 'mean',
+                datasets: [{
+                    dateFilter: '',
+                    consultantFilter: '',
+                    genericFilters: {},
+                    background: "rgba(213, 50, 99, 0.3)",
+                    border: "rgba(213, 50, 99, 0.8)",
+                }]
+            });
+        } else if (key === 'calculationMethod') {
+            oldChart.calculationMethod = value
+        } else {
+            oldChart['datasets'][datasetIndex][key] = value;
         }
 
-        this.setState({charts: chartsCopy})
+        this.setState({charts: chartsCopy});
     }
 
-    selectFilter(id, key, value) {
+    selectFilter(chartId, datasetIndex, key, value) {
         let chartsCopy = this.state.charts.slice();
         let oldChart = null;
 
         for (let chart in chartsCopy) {
-            if (chartsCopy[chart].id === id) {
+            if (chartsCopy[chart].id === chartId) {
                 oldChart = chartsCopy[chart];
                 break
             }
         }
 
-        oldChart['genericFilters'][key] = value;
-
-        // if form is changing then reset filters
-        if (key === 'form') {
-            oldChart.dateFilter = '';
-            oldChart.consultantFilter = '';
-        }
-
+        oldChart['datasets'][datasetIndex]['genericFilters'][key] = value;
         this.setState({charts: chartsCopy})
     }
 
@@ -88,19 +145,45 @@ class Main extends Component {
         return this.state.charts.map((item) => {
             return (
                 <div key={item.id} className="generic-card" >
-                    <button className="generic-card-close btn-floating cyan" onClick={() => {return this.handleLessChartsClick(item.id)}} >
+                    <button
+                        className="generic-card-close btn-floating cyan"
+                        onClick={() => {return this.handleLessChartsClick(item.id)}}
+                        title={"close chart"}
+                    >
                         <i className="material-icons">
                             close
                         </i>
                     </button>
-                    <ChartComponent formsList={this.props.formList} id={item.id}
-                                    form={item.form}
-                                    calculationMethod={item.calculationMethod}
-                                    dateFilter={item.dateFilter}
-                                    consultantFilter={item.consultantFilter}
-                                    genericFilters={item.genericFilters}
-                                    selectGenericFilter={(id, key, value) => {this.selectFilter(id, key, value)}}
-                                    selectOption={(id, key, value) => {this.selectOption(id, key, value)}}
+
+                    {item.form.value &&
+                    <button
+                        className={"generic-card-close btn-floating cyan"}
+                        onClick={() => {this.handleMoreDatasetsClick(item.id)}}
+                        title={"add another dataset to this chart"}
+                    >
+                        <i className="material-icons">
+                            add
+                        </i>
+                    </button>}
+
+                    {item.form.value &&
+                    <button
+                        className={"generic-card-close btn-floating cyan"}
+                        onClick={() => {this.handleLessDataSetsClick(item.id)}}
+                        title={"remove a dataset from this chart"}
+                    >
+                        <i className="material-icons">
+                            remove
+                        </i>
+                    </button>}
+
+                    <ChartComponent
+                        formsList={this.props.formList} id={item.id}
+                        form={item.form}
+                        datasets={item.datasets}
+                        calculationMethod={item.calculationMethod}
+                        selectGenericFilter={(chartId, datasetIndex, key, value) => {this.selectFilter(chartId, datasetIndex, key, value)}}
+                        selectOption={(chartId, datasetIndex, key, value) => {this.selectOption(chartId, datasetIndex, key, value)}}
                     />
                 </div>
             );
@@ -111,7 +194,11 @@ class Main extends Component {
         return (
             <div>
                 {this.renderCharts()}
-                <button className="new-chart-button btn-floating cyan" onClick={() => {return this.handleMoreChartsClick()}} >
+                <button
+                    className="new-chart-button btn-floating cyan"
+                    onClick={() => {return this.handleMoreChartsClick()}}
+                    title={"add a new chart"}
+                >
                     <i className="material-icons">
                         add
                     </i>

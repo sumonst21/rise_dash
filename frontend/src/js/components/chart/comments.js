@@ -9,7 +9,7 @@ class Comments extends Component {
             (key) => {
                 if (typeof formItem[key] === 'string' && key !== '_id') {
                     comments.push(
-                        <p key={Math.random()} >{key}: {formItem[key]}</p>
+                        <p key={Math.random()} >{key.split('_').join(' ')}: {formItem[key]}</p>
                     )
                 }
             }
@@ -22,7 +22,7 @@ class Comments extends Component {
         return this.props.data.map((item) => {
             return (
                 <div key={item._id}>
-                    <p>Response ID: {item._id}</p>
+                    {/*<p>Response ID: {item._id}</p>*/}
                     <div>{this.buildComment(item)}</div>
                     <br/>
                 </div>
@@ -32,7 +32,7 @@ class Comments extends Component {
 
     render() {
         return (
-            <div>
+            <div className={"card-comments"}>
                 {this.buildComments()}
             </div>
         )

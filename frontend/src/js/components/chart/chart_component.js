@@ -22,12 +22,13 @@ class ChartComponent extends Component {
         super();
         this.state = {
             unfilteredData:[],
-            filteredData: [],
+            filteredDatasets: [],
             hasDate: false,
             hasConsultant: false,
             loading: false,
             showComments: false,
-            filterableKeys: new Set()
+            filterableKeys: new Set(),
+            showFiltersets: []
         }
     };
 
@@ -54,33 +55,46 @@ class ChartComponent extends Component {
         return keys
     }
 
-    fetchFormData(formId) {
+    fetchFormData(formId, datasets) {
         const url = `${API_URL}${formId}/`;
         axios.get(url, {headers: getHeaders()}).then(
             (response) => {
+                let unfilteredData = ChartComponent.renameOldFields(response.data);
+
                 this.setState({
-                    unfilteredData: ChartComponent.renameOldFields(response.data),
+                    unfilteredData: unfilteredData,
                     hasDate: response.data[0].hasOwnProperty('date_of_session'),
                     hasConsultant: response.data[0].hasOwnProperty('consultant_name'),
                     filterableKeys: ChartComponent.getFilterableKeys(response.data),
-                    loading: false
+                    loading: false,
+                    filteredDatasets: datasets.map((dataset) => {return this.filterData(dataset, unfilteredData)})
                 })
             }
         )
     }
 
-    componentWillUpdate(nextProps, nextState) {
+
+    filterData(dataset, unfilteredData) {
+        let data = selectFilteredData({
+            unfilteredData: unfilteredData,
+            dateFilter: dataset.dateFilter,
+            consultantFilter: dataset.consultantFilter,
+            genericFilters: dataset.genericFilters
+        });
+        return {
+            data: data,
+            background: dataset.background,
+            border: dataset.border
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
         if (this.props.form.value !== nextProps.form.value) {
             this.setState({loading: true});
-            this.fetchFormData(nextProps.form.value);
+            this.fetchFormData(nextProps.form.value, nextProps.datasets);
+        } else {
+            this.setState({filteredDatasets: nextProps.datasets.map((dataset) => {return this.filterData(dataset, this.state.unfilteredData)})})
         }
-
-        nextState['filteredData'] = Boolean(nextState['filteredData']) ? selectFilteredData({
-            unfilteredData: nextState.unfilteredData,
-            dateFilter: nextProps.dateFilter,
-            consultantFilter: nextProps.consultantFilter,
-            genericFilters: nextProps.genericFilters
-        }) : []
     }
 
     extractFromData = (data, key_name) => {
@@ -112,70 +126,117 @@ class ChartComponent extends Component {
         })
     }
 
+    handleShowFilters(filterset) {
+        this.setState(
+            {
+                showFiltersets: this.state.showFiltersets.includes(filterset) ? this.state.showFiltersets.filter(
+                    (x) => {return x !== filterset}
+                ) : this.state.showFiltersets.concat([filterset])
+            }
+        )
+    }
+
+    renderFilters(dataset, index) {
+        return (
+            <div key={index} >
+                <button className={"filterset-button waves-effect btn cyan"} onClick={() => {this.handleShowFilters(index)}} >
+                    <i className="text-icon-fix material-icons right" style={{color: dataset.border}}> brightness_1 </i>
+                    filterset {index}
+                </button>
+
+                {this.state.showFiltersets.includes(index) && <div>
+                    {this.state.hasDate &&
+                    <GenericDropdown data={this.extractFromData(dataset.data, 'date_of_session')}
+                                     onChange={(v) => {
+                                         this.props.selectOption(this.props.id, index, 'dateFilter', v.value)
+                                     }}
+                                     placeholder="select a date"
+                                     value={this.props.datasets[index].dateFilter}
+                                     title="Date"/>}
+
+                    {this.state.hasConsultant &&
+                    <GenericDropdown data={this.extractFromData(dataset.data, 'consultant_name')}
+                                     onChange={(v) => {
+                                         this.props.selectOption(this.props.id, index, 'consultantFilter', v.value)
+                                     }}
+                                     placeholder="select a name"
+                                     value={this.props.datasets[index].consultantFilter}
+                                     title="Consultant"/>}
+
+                    {this.state.filterableKeys.has('user') &&
+                    <GenericDropdown data={this.extractFromData(dataset.data, 'user')}
+                                     onChange={(v) => {
+                                         this.props.selectGenericFilter(this.props.id, index, 'user', v.value)
+                                     }}
+                                     placeholder="select a user"
+                                     value={this.props.datasets[index].genericFilters.user}
+                                     title="user"/>}
+
+                    {this.state.filterableKeys.has('exec_member') &&
+                    <GenericDropdown data={this.extractFromData(dataset.data, 'exec_member')}
+                                     onChange={(v) => {
+                                         this.props.selectGenericFilter(this.props.id, index, 'exec_member', v.value)
+                                     }}
+                                     placeholder="select a participant"
+                                     value={this.props.datasets[index].genericFilters.exec_member}
+                                     title="Participant"/>}
+
+                </div>}
+            </div>
+        )
+    }
+
+
     render () {
         const { formsList } = this.props;
 
         return (
             <div>
-                <button className="generic-card-close btn-floating cyan" onClick={() => {
-                    this.setState({loading: true});
-                    this.fetchFormData(this.props.form.value)
-                }} >
+                {this.props.form.value &&
+                <button
+                    className="generic-card-close btn-floating cyan"
+                    onClick={() => {
+                        this.setState({loading: true});
+                        this.fetchFormData(this.props.form.value, this.props.datasets)
+                    }}
+                    title={"refresh chart data"}
+                >
                     <i className="material-icons">
                         refresh
                     </i>
-                </button>
+                </button>}
                 <GenericDropdown data={ChartComponent.mapForms(formsList)}
-                                 onChange={(v) => {this.props.selectOption(this.props.id, 'form', v)}}
+                                 onChange={(v) => {this.props.selectOption(this.props.id, 0, 'form', v)}}
                                  value={this.props.form.label}
                                  placeholder="select a form"
                                  title="Form" />
 
-                {Boolean(this.state.filteredData.length) && <GenericDropdown data={['mean', 'nps']}
-                                                              onChange={(v) => {this.props.selectOption(this.props.id, 'calculationMethod', v.value)}}
-                                                              placeholder="mean"
-                                                              value={this.props.calculationMethod}
-                                                              title="Calculation"/>}
+                {Boolean(this.props.form.value) &&
+                <GenericDropdown data={['mean', 'nps']}
+                                 onChange={(v) => {
+                                     this.props.selectOption(this.props.id, 0, 'calculationMethod', v.value)
+                                 }}
+                                 placeholder="mean"
+                                 value={this.props.calculationMethod}
+                                 title="Calculation"/>}
 
-                {this.state.hasDate && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'date_of_session')}
-                                                        onChange={(v) => {this.props.selectOption(this.props.id, 'dateFilter', v.value)}}
-                                                        placeholder="select a date"
-                                                        value={this.props.dateFilter}
-                                                        title="Date"/>}
+                {this.props.form.value && <div className={"generic-card-filterset"}>
+                    {
+                        this.state.filteredDatasets.map((dataset, index) => {
+                            return this.renderFilters(dataset, index)
+                        })
+                    }
+                </div>}
 
-                {this.state.hasConsultant && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'consultant_name')}
-                                                              onChange={(v) => {this.props.selectOption(this.props.id, 'consultantFilter', v.value)}}
-                                                              placeholder="select a name"
-                                                              value={this.props.consultantFilter}
-                                                              title="Consultant" />}
+                {this.props.form.value && <Chart formId={this.state.filteredDatasets} calculationMethod={this.props.calculationMethod}
+                       loading={this.state.loading}/>}
 
-                {this.state.filterableKeys.has('user') && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'user')}
-                                                                           onChange={(v) => {
-                                                                               this.props.selectGenericFilter(this.props.id, 'user', v.value)
-                                                                           }}
-                                                                           placeholder="select a user"
-                                                                           value={this.props.genericFilters.user}
-                                                                           title="user"/>}
-
-                {this.state.filterableKeys.has('exec_member') && <GenericDropdown data={this.extractFromData(this.state.filteredData, 'exec_member')}
-                                                                                       onChange={(v) => {
-                                                                                           this.props.selectGenericFilter(this.props.id, 'exec_member', v.value)
-                                                                                       }}
-                                                                                       placeholder="select a participant"
-                                                                                       value={this.props.genericFilters.exec_member}
-                                                                                       title="Participant"/>}
-
-                <Chart formId={this.state.filteredData} calculation={this.props.calculationMethod}
-                       loading={this.state.loading}/>
-
-                {Boolean(this.state.filteredData.length) && <h4>Number of forms: {this.state.filteredData.length}</h4>}
-
-                {Boolean(this.state.filteredData.length) && <button
+                {Boolean(this.state.unfilteredData.length) && <button
                     className="waves-effect btn cyan" onClick={() => {
                     return this.handleShowComments()
                 }}><i className="text-icon-fix material-icons right">{this.state.showComments ? 'expand_less' : 'expand_more'}</i> Comments</button>}
 
-                {this.state.showComments && <Comments data={this.state.filteredData}/>}
+                {this.state.showComments && <Comments data={this.state.unfilteredData}/>}
 
             </div>
         );
