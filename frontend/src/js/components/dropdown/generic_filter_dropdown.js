@@ -23,20 +23,20 @@ class GenericDropdown extends Component {
         if (this.props.value !== undefined) {
             return (
                 <div className="dropdown-block">
-                   <Dropdown value={this.props.value}
-                                                                                      options={this.props.data}
-                                                                                      onChange={this._onSelect}
-                                                                                      className="dropdown-dropdown"
-                                                                                      placeholder={this.props.placeholder} />
+                    <Dropdown value={this.props.value}
+                              options={this.props.data}
+                              onChange={this._onSelect}
+                              className="dropdown-dropdown"
+                              placeholder={this.props.placeholder}/>
                 </div>
             );
         } else {
             return (
                 <div className="dropdown-block">
                     <Dropdown options={this.props.data}
-                                                                                      onChange={this._onSelect}
-                                                                                      className="dropdown-dropdown"
-                                                                                      placeholder={this.props.placeholder} />
+                              onChange={this._onSelect}
+                              className="dropdown-dropdown"
+                              placeholder={this.props.placeholder}/>
                 </div>
             );
         }

@@ -168,9 +168,9 @@ class Chart extends Component{
 
     render () {
         let options = {
-            legend: {
-                display: false
-            },
+            // legend: {
+            //     display: false
+            // },
             scales: {
                 xAxes: [{
                     stacked: false,
