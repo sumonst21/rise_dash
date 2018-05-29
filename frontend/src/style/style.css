@@ -216,6 +216,7 @@ body {
 
 .filterset-group {
     max-width: 200px;
+    margin-bottom: 20px;
 }
 
 .filterset-input {
