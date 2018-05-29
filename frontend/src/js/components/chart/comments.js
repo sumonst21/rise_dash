@@ -34,7 +34,7 @@ class Comments extends Component {
         return this.props.datasets.map((dataset, index) => {
             return (
                 <div key={index}>
-                    dataset {index}
+                    {dataset.name ? dataset.name : $`dataset {index}`}
                     {this.buildComments(dataset.data)}
                 </div>
             )
