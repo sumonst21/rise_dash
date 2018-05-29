@@ -18,8 +18,8 @@ class Comments extends Component {
         return comments
     }
 
-    buildComments () {
-        return this.props.data.map((item) => {
+    buildComments (data) {
+        return data.map((item) => {
             return (
                 <div key={item._id}>
                     {/*<p>Response ID: {item._id}</p>*/}
@@ -30,10 +30,21 @@ class Comments extends Component {
         })
     }
 
+    buildDatasetComments () {
+        return this.props.datasets.map((dataset, index) => {
+            return (
+                <div key={index}>
+                    dataset {index}
+                    {this.buildComments(dataset.data)}
+                </div>
+            )
+        })
+    }
+
     render() {
         return (
             <div className={"card-comments"}>
-                {this.buildComments()}
+                {this.buildDatasetComments()}
             </div>
         )
     }

@@ -15,6 +15,7 @@ const blankChartState = {
         genericFilters: {},
         background: "rgba(213, 50, 99, 0.3)",
         border: "rgba(213, 50, 99, 0.8)",
+        name: ""
     }]
 };
 
@@ -57,7 +58,8 @@ class Main extends Component {
                         consultantFilter: '',
                         genericFilters: {},
                         border: border,
-                        background: background
+                        background: background,
+                        name: ""
                     }];
                 }
             }
@@ -115,6 +117,7 @@ class Main extends Component {
                     genericFilters: {},
                     background: "rgba(213, 50, 99, 0.3)",
                     border: "rgba(213, 50, 99, 0.8)",
+                    name: ""
                 }]
             });
         } else if (key === 'calculationMethod') {
@@ -138,6 +141,20 @@ class Main extends Component {
         }
 
         oldChart['datasets'][datasetIndex]['genericFilters'][key] = value;
+        this.setState({charts: chartsCopy})
+    }
+
+    setDatasetName(chartId, datasetIndex, name) {
+        let chartsCopy = this.state.charts.slice();
+        let oldChart = null;
+
+        for (let chart in chartsCopy) {
+            if (chartsCopy[chart].id === chartId) {
+                oldChart = chartsCopy[chart];
+                break
+            }
+        }
+        oldChart['datasets'][datasetIndex]['name'] = name;
         this.setState({charts: chartsCopy})
     }
 
@@ -184,6 +201,7 @@ class Main extends Component {
                         calculationMethod={item.calculationMethod}
                         selectGenericFilter={(chartId, datasetIndex, key, value) => {this.selectFilter(chartId, datasetIndex, key, value)}}
                         selectOption={(chartId, datasetIndex, key, value) => {this.selectOption(chartId, datasetIndex, key, value)}}
+                        setDatasetName={(chartId, datasetIndex, name) => {this.setDatasetName(chartId, datasetIndex, name)}}
                     />
                 </div>
             );
