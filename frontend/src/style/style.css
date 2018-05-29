@@ -214,6 +214,14 @@ body {
     margin-right: 30px
 }
 
+.filterset-group {
+    max-width: 200px;
+}
+
+.filterset-input {
+    max-width: 80%;
+}
+
 .post {
   display: flex;
   margin: 20px 0px 20px 0px;

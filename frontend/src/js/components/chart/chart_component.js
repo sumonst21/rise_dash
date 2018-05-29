@@ -5,6 +5,7 @@ import GenericDropdown from '../dropdown/generic_filter_dropdown';
 import Chart from '../chart/chart';
 import axios from "axios/index";
 import Comments from './comments';
+import TextInput from '../helpers/textfield'
 
 const API_URL = `${process.env.BASE_API_URL}/form_data/`;
 
@@ -84,13 +85,14 @@ class ChartComponent extends Component {
         return {
             data: data,
             background: dataset.background,
-            border: dataset.border
+            border: dataset.border,
+            name: dataset.name
         }
     }
 
     componentWillReceiveProps(nextProps) {
         if (this.props.form.value !== nextProps.form.value) {
-            this.setState({loading: true});
+            this.setState({loading: true, showComments: false});
             this.fetchFormData(nextProps.form.value, nextProps.datasets);
         } else {
             this.setState({filteredDatasets: nextProps.datasets.map((dataset) => {return this.filterData(dataset, this.state.unfilteredData)})})
@@ -138,17 +140,19 @@ class ChartComponent extends Component {
 
     renderFilters(dataset, index) {
         return (
-            <div key={index} >
+            <div key={index} className={'filterset-group'} >
                 <button
                     className={"filterset-button waves-effect btn cyan"}
                     onClick={() => {this.handleShowFilters(index)}}
                     title={'show filters for this dataset'}
                 >
                     <i className="text-icon-fix material-icons right" style={{color: dataset.border}}> brightness_1 </i>
-                    dataset {index}
+                    {dataset.name ? dataset.name: `dataset ${index}`}
                 </button>
 
+
                 {this.state.showFiltersets.includes(index) && <div>
+                    <TextInput className="filterset-input" handleChange={(value) => {this.props.setDatasetName(this.props.id, index, value)}} index={index} />
                     {this.state.hasDate &&
                     <GenericDropdown data={this.extractFromData(dataset.data, 'date_of_session')}
                                      onChange={(v) => {
@@ -240,7 +244,7 @@ class ChartComponent extends Component {
                     return this.handleShowComments()
                 }}><i className="text-icon-fix material-icons right">{this.state.showComments ? 'expand_less' : 'expand_more'}</i> Comments</button>}
 
-                {this.state.showComments && <Comments data={this.state.unfilteredData}/>}
+                {this.state.showComments && <Comments datasets={this.state.filteredDatasets}/>}
 
             </div>
         );

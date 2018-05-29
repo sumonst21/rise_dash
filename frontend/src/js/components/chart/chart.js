@@ -157,7 +157,7 @@ class Chart extends Component{
 
             chartData.datasets[index].backgroundColor = chartDataset.background;
             chartData.datasets[index].borderColor = chartDataset.border;
-            chartData.datasets[index].label = `dataset ${index}`;
+            chartData.datasets[index].label = chartDataset.name ? chartDataset.name : `dataset ${index}`;
         });
 
         let labels = [...labelSet];
